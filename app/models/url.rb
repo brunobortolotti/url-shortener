@@ -7,6 +7,10 @@ class Url < ApplicationRecord
     url.save
   end
 
+  def increment_visits!
+    self.increment!(:visit_count)
+  end
+
   def generate_key(i)
     # this code was extracted from http://refactormycode.com/codes/125-base-62-encoding
     # with only minor modification

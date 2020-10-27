@@ -1,9 +1,9 @@
 class UrlsController < ApplicationController
-  before_action :set_url, only: [:show, :update, :destroy]
+  before_action :set_url, only: [:show]
 
   # GET /urls
   def index
-    @urls = Url.all
+    @urls = Url.order(visit_count: :desc)
 
     render json: @urls
   end
@@ -11,6 +11,7 @@ class UrlsController < ApplicationController
   # GET /urls/1
   def show
     if @url.present?
+      @url.increment_visits!
       redirect_to @url.source
     else
       render json: { error: 'URL not found' }, status: :not_found
@@ -22,25 +23,12 @@ class UrlsController < ApplicationController
     @url = Url.new({ source: url_params[:url] })
 
     if @url.save
-      render json: @url, status: :created
+      render json: { url: @url.key }, status: :created
     else
       render json: @url.errors, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /urls/1
-  def update
-    if @url.update(url_params)
-      render json: @url
-    else
-      render json: @url.errors, status: :unprocessable_entity
-    end
-  end
-
-  # DELETE /urls/1
-  def destroy
-    @url.destroy
-  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
